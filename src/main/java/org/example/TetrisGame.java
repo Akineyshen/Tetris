@@ -23,12 +23,12 @@ public class TetrisGame {
         int shapeType = random.nextInt(2); // 0 для I, 1 для O (добавьте больше фигур по мере необходимости)
         switch (shapeType) {
             case 0: currentTetromino = new IShape(); break; // Прямоугольная фигура
-            //case 3: currentTetromino = new JShape(); break; // Фигура J
-            //case 2: currentTetromino = new LShape(); break; // Фигура L
-            case 1: currentTetromino = new OShape(); break; // Квадрат
-            //case 4: currentTetromino = new SShape(); break; // Фигура S
-            //case 5: currentTetromino = new TShape(); break; // Фигура T
-            //case 6: currentTetromino = new ZShape(); break; // Фигура Z
+            case 1: currentTetromino = new JShape(); break; // Фигура J
+            case 2: currentTetromino = new LShape(); break; // Фигура L
+            case 3: currentTetromino = new OShape(); break; // Квадрат
+            case 4: currentTetromino = new SShape(); break; // Фигура S
+            case 5: currentTetromino = new TShape(); break; // Фигура T
+            case 6: currentTetromino = new ZShape(); break; // Фигура Z
             default: currentTetromino = new IShape(); break; // На всякий случай
         }
         // Установка начальных координат
@@ -49,7 +49,7 @@ public class TetrisGame {
             // Отображение текущей фигуры
             displayCurrentTetromino();
 
-            System.out.println("Введите команду (a: влево, d: вправо, s: вниз, r: вращение, q: выход): ");
+            System.out.println("Select action: \na: ←, d: →, s: ↓, r: ↻, q: ❌): ");
             String command = scanner.nextLine();
 
             switch (command) {
@@ -82,7 +82,7 @@ public class TetrisGame {
                     System.exit(0);
                     break;
                 default:
-                    System.out.println("Неверная команда. Пожалуйста, попробуйте снова.");
+                    System.out.println("The wrong command. Please choose the right command.");
             }
 
             // Обновляем отображение доски после каждого ввода

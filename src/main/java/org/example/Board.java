@@ -62,11 +62,11 @@ public class Board {
     public void display(int[][] displayBoard) {
         for (int row = 0; row < HEIGHT; row++) {
             for (int col = 0; col < WIDTH; col++) {
-                System.out.print(displayBoard[row][col] == 0 ? "." : "#");
+                System.out.print(displayBoard[row][col] == 0 ? "▪" : "█");
             }
             System.out.println();
         }
-        System.out.println("[][][][][]");
+        System.out.println("▭▭▭▭▭▭");
     }
 
     // Перегруженный метод для случая, когда не передаётся временная доска

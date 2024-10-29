@@ -1,13 +1,14 @@
 package org.example;
 
-// Фигура квадрат
-public class OShape extends Shape {
+// Фигура J
+public class JShape extends Shape {
     public static final int[][] SHAPE = {
-            {1, 1},
+            {0, 1},
+            {0, 1},
             {1, 1}
     };
 
-    public OShape() {
+    public JShape() {
         super(SHAPE);
     }
 }
