@@ -20,7 +20,7 @@ public class TetrisGame {
 
     private void spawnNewTetromino() {
         // Здесь можно добавлять логику для разных фигур
-        int shapeType = random.nextInt(2); // 0 для I, 1 для O (добавьте больше фигур по мере необходимости)
+        int shapeType = random.nextInt(7); // 0 для I, 1 для O (добавьте больше фигур по мере необходимости)
         switch (shapeType) {
             case 0: currentTetromino = new IShape(); break; // Прямоугольная фигура
             case 1: currentTetromino = new JShape(); break; // Фигура J
