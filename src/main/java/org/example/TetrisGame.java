@@ -114,7 +114,6 @@ public class TetrisGame {
     }
 
 
-
     // Метод для отображения текущей фигуры на доске
     private void displayCurrentTetromino() {
         if (currentTetromino == null) {
