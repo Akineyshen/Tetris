@@ -17,8 +17,54 @@ public class Board {
         return WIDTH;
     }
 
-    public int getCell(int row, int col) {
-        return board[row][col];
+    public void placeTetromino(Shape tetromino) {
+        int[][] shape = tetromino.getShape();
+        int x = tetromino.getPosX();
+        int y = tetromino.getPosY();
+
+        for (int r = 0; r < shape.length; r++) {
+            for (int c = 0; c < shape[0].length; c++) {
+                if (shape[r][c] != 0) { // Если клетка фигуры не пустая
+                    board[y + r][x + c] = shape[r][c]; // Добавляем фигуру на поле
+                }
+            }
+        }
+
+        clearFullLines(); // Проверяем и очищаем заполненные линии после размещения фигуры
+    }
+
+    private void clearFullLines() {
+        for (int row = 0; row < HEIGHT; row++) {
+            if (isFullLine(row)) {
+                removeLine(row);
+                shiftDown(row);
+            }
+        }
+    }
+
+    private boolean isFullLine(int row) {
+        for (int col = 0; col < WIDTH; col++) {
+            if (board[row][col] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void removeLine(int row) {
+        for (int col = 0; col < WIDTH; col++) {
+            board[row][col] = 0; // Очищаем заполненную строку
+        }
+    }
+
+    private void shiftDown(int row) {
+        for (int r = row; r > 0; r--) {
+            System.arraycopy(board[r - 1], 0, board[r], 0, WIDTH); // Сдвигаем строки вниз
+        }
+        // Заполняем верхнюю строку нулями после сдвига
+        for (int col = 0; col < WIDTH; col++) {
+            board[0][col] = 0;
+        }
     }
 
     public boolean canMove(Shape tetromino, int newX, int newY) {
@@ -44,19 +90,6 @@ public class Board {
         return true; // Движение допустимо
     }
 
-    public void placeTetromino(Shape tetromino) {
-        int[][] shape = tetromino.getShape();
-        int x = tetromino.getPosX();
-        int y = tetromino.getPosY();
-
-        for (int r = 0; r < shape.length; r++) {
-            for (int c = 0; c < shape[0].length; c++) {
-                if (shape[r][c] != 0) { // Если клетка фигуры не пустая
-                    board[y + r][x + c] = shape[r][c]; // Добавляем фигуру на поле
-                }
-            }
-        }
-    }
 
     // Метод для отображения сетки в консоли
     public void display(int[][] displayBoard) {

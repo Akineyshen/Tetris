@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -41,61 +42,78 @@ public class TetrisGame {
     }
 
     public void play() {
+        long lastFallTime = System.currentTimeMillis(); // Таймер для автоматического падения
+        int fallDelay = 500; // Задержка в миллисекундах
+
         while (!gameOver) {
-            // Проверяем, если текущая фигура равна null, спавним новую
-            if (currentTetromino == null) {
-                spawnNewTetromino();
-            }
-            // Отображение текущей фигуры
-            displayCurrentTetromino();
-
-            System.out.println("Select action: \na: ←, d: →, s: ↓, r: ↻, q: ❌): ");
-            String command = scanner.nextLine();
-
-            switch (command) {
-                case "a": // Влево
-                    if (board.canMove(currentTetromino, currentTetromino.getPosX() - 1, currentTetromino.getPosY())) {
-                        currentTetromino.moveLeft();
+            // Автоматическое падение фигуры
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastFallTime > fallDelay) {
+                if (board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY() + 1)) {
+                    currentTetromino.moveDown(); // Перемещение вниз
+                } else {
+                    board.placeTetromino(currentTetromino); // Фиксация на поле
+                    currentTetromino = null; // Подготовка для следующей фигуры
+                    spawnNewTetromino(); // Создаем новую фигуру
+                    if (gameOver) { // Проверка, если новая фигура не влезла
+                        System.out.println("Game Over!");
+                        break;
                     }
-                    break;
-                case "d": // Вправо
-                    if (board.canMove(currentTetromino, currentTetromino.getPosX() + 1, currentTetromino.getPosY())) {
-                        currentTetromino.moveRight();
-                    }
-                    break;
-                case "s": // Вниз
-                    if (board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY() + 1)) {
-                        currentTetromino.moveDown();
-                    } else {
-                        board.placeTetromino(currentTetromino); // Фиксируем фигуру на поле
-                        currentTetromino = null; // Устанавливаем текущую фигуру в null для создания новой
-                    }
-                    break;
-                case "r": // Вращение
-                    currentTetromino.rotate();
-                    if (!board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY())) {
-                        // Возвращаем фигуру в прежнее состояние, если вращение невозможно
-                        currentTetromino.rotate(); // Можно добавить логику для отмены вращения
-                    }
-                    break;
-                case "q": // Выход
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("The wrong command. Please choose the right command.");
+                }
+                lastFallTime = currentTime; // Обновление времени
             }
 
-            // Обновляем отображение доски после каждого ввода
+            // Отображение текущего состояния поля
             displayCurrentTetromino();
 
-            // Задержка между обновлениями (если требуется)
+            // Обработка пользовательского ввода без блокировки
             try {
-                Thread.sleep(500);
+                if (System.in.available() > 0) {
+                    char command = (char) System.in.read();
+
+                    switch (command) {
+                        case 'a': // Влево
+                            if (board.canMove(currentTetromino, currentTetromino.getPosX() - 1, currentTetromino.getPosY())) {
+                                currentTetromino.moveLeft();
+                            }
+                            break;
+                        case 'd': // Вправо
+                            if (board.canMove(currentTetromino, currentTetromino.getPosX() + 1, currentTetromino.getPosY())) {
+                                currentTetromino.moveRight();
+                            }
+                            break;
+                        case 's': // Вниз (ускоренное падение)
+                            if (board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY() + 1)) {
+                                currentTetromino.moveDown();
+                            }
+                            break;
+                        case 'r': // Вращение
+                            currentTetromino.rotate();
+                            if (!board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY())) {
+                                currentTetromino.rotate(); // Отменяем вращение, если не подходит
+                            }
+                            break;
+                        case 'q': // Выход
+                            System.exit(0);
+                            break;
+                        default:
+                            System.out.println("Неверная команда. Пожалуйста, попробуйте снова.");
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Небольшая задержка для плавности обновлений
+            try {
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
     }
+
+
 
     // Метод для отображения текущей фигуры на доске
     private void displayCurrentTetromino() {
