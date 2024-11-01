@@ -127,17 +127,5 @@ public class TetrisGame {
         TetrisGame game = new TetrisGame();
         game.play();
     }
-
-    public void start() {
-        spawnNewTetromino();
-    }
-
-    public Shape getCurrentTetromino() {
-        return currentTetromino;
-    }
-
-    public Board getBoard() {
-        return board;
-    }
 }
 

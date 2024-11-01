@@ -69,21 +69,6 @@ public class Board {
         System.out.println("▭▭▭▭▭▭");
     }
 
-    // Перегруженный метод для случая, когда не передаётся временная доска
-    public void display() {
-        display(board); // Отображаем основную доску
-    }
-
-    public void clear() {
-        for (int r = 0; r < board.length; r++) {
-            for (int c = 0; c < board[0].length; c++) {
-                board[r][c] = 0; // Очищаем клетку
-            }
-        }
-    }
-    public int[][] getBoard() {
-        return board;
-    }
     public int[][] getBoardCopy() {
         int[][] copy = new int[board.length][board[0].length];
         for (int i = 0; i < board.length; i++) {
