@@ -5,10 +5,11 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class TetrisGame {
-    private boolean gameOver = false; // Переменная для отслеживания состояния игры
+    private boolean gameOver = false;
 
     private Board board;
     private Shape currentTetromino;
+    private Shape nextTetromino; // Новая переменная для хранения следующей фигуры
     private Random random;
     private Scanner scanner;
 
@@ -16,25 +17,32 @@ public class TetrisGame {
         board = new Board();
         random = new Random();
         scanner = new Scanner(System.in);
-        spawnNewTetromino();
+        nextTetromino = generateRandomTetromino(); // Инициализируем следующую фигуру
+        spawnNewTetromino(); // Спавним текущую фигуру
+    }
+
+    private Shape generateRandomTetromino() {
+        // Логика для генерации случайной фигуры
+        int shapeType = random.nextInt(7);
+        switch (shapeType) {
+            case 0: return new IShape();
+            case 1: return new JShape();
+            case 2: return new LShape();
+            case 3: return new OShape();
+            case 4: return new SShape();
+            case 5: return new TShape();
+            case 6: return new ZShape();
+            default: return new IShape();
+        }
     }
 
     private void spawnNewTetromino() {
-        // Здесь можно добавлять логику для разных фигур
-        int shapeType = random.nextInt(7); // 0 для I, 1 для O (добавьте больше фигур по мере необходимости)
-        switch (shapeType) {
-            case 0: currentTetromino = new IShape(); break; // Прямоугольная фигура
-            case 1: currentTetromino = new JShape(); break; // Фигура J
-            case 2: currentTetromino = new LShape(); break; // Фигура L
-            case 3: currentTetromino = new OShape(); break; // Квадрат
-            case 4: currentTetromino = new SShape(); break; // Фигура S
-            case 5: currentTetromino = new TShape(); break; // Фигура T
-            case 6: currentTetromino = new ZShape(); break; // Фигура Z
-            default: currentTetromino = new IShape(); break; // На всякий случай
-        }
-        // Установка начальных координат
-        currentTetromino.posX = board.getWidth() / 2 - 1; // Центрируем по X
-        currentTetromino.posY = 0; // Начальная позиция по Y
+        currentTetromino = nextTetromino; // Текущей фигурой становится следующая
+        nextTetromino = generateRandomTetromino(); // Генерируем новую следующую фигуру
+
+        currentTetromino.posX = board.getWidth() / 2 - 1;
+        currentTetromino.posY = 0;
+
         // Проверка, если новая фигура не может быть размещена на верхней позиции
         if (!board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY())) {
             gameOver = true; // Устанавливаем состояние игры в "проигрыш"
@@ -42,31 +50,28 @@ public class TetrisGame {
     }
 
     public void play() {
-        long lastFallTime = System.currentTimeMillis(); // Таймер для автоматического падения
-        int fallDelay = 500; // Задержка в миллисекундах
+        long lastFallTime = System.currentTimeMillis();
+        int fallDelay = 500;
 
         while (!gameOver) {
-            // Автоматическое падение фигуры
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastFallTime > fallDelay) {
                 if (board.canMove(currentTetromino, currentTetromino.getPosX(), currentTetromino.getPosY() + 1)) {
-                    currentTetromino.moveDown(); // Перемещение вниз
+                    currentTetromino.moveDown();
                 } else {
-                    board.placeTetromino(currentTetromino); // Фиксация на поле
-                    currentTetromino = null; // Подготовка для следующей фигуры
-                    spawnNewTetromino(); // Создаем новую фигуру
-                    if (gameOver) { // Проверка, если новая фигура не влезла
+                    board.placeTetromino(currentTetromino);
+                    spawnNewTetromino(); // Спавним новую фигуру
+                    if (gameOver) {
                         System.out.println("Game Over!");
                         break;
                     }
                 }
-                lastFallTime = currentTime; // Обновление времени
+                lastFallTime = currentTime;
             }
 
-            // Отображение текущего состояния поля
             displayCurrentTetromino();
+            displayNextTetromino(); // Отображаем следующую фигуру
 
-            // Обработка пользовательского ввода без блокировки
             try {
                 if (System.in.available() > 0) {
                     char command = (char) System.in.read();
@@ -104,7 +109,6 @@ public class TetrisGame {
                 e.printStackTrace();
             }
 
-            // Небольшая задержка для плавности обновлений
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -113,21 +117,18 @@ public class TetrisGame {
         }
     }
 
-
     // Метод для отображения текущей фигуры на доске
     private void displayCurrentTetromino() {
         if (currentTetromino == null) {
-            return; // Проверка на null, чтобы избежать NullPointerException
+            return;
         }
 
         int[][] shape = currentTetromino.getShape();
         int x = currentTetromino.getPosX();
         int y = currentTetromino.getPosY();
 
-        // Копируем текущую доску и добавляем в неё текущую фигуру для отображения
         int[][] displayBoard = board.getBoardCopy();
 
-        // Добавляем фигуру в отображение
         for (int r = 0; r < shape.length; r++) {
             for (int c = 0; c < shape[0].length; c++) {
                 if (shape[r][c] != 0) {
@@ -135,14 +136,30 @@ public class TetrisGame {
                 }
             }
         }
-        // Выводим временную доску с текущей фигурой
+
         board.display(displayBoard);
     }
 
+    // Метод для отображения следующей фигуры сбоку от доски
+    private void displayNextTetromino() {
+        if (nextTetromino == null) {
+            return;
+        }
+
+        int[][] shape = nextTetromino.getShape();
+        System.out.println("Next shape:");
+
+        for (int r = 0; r < shape.length; r++) {
+            for (int c = 0; c < shape[0].length; c++) {
+                System.out.print(shape[r][c] == 0 ? " " : "█");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 
     public static void main(String[] args) {
         TetrisGame game = new TetrisGame();
         game.play();
     }
 }
-
